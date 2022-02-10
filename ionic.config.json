@@ -1,0 +1,7 @@
+{
+  "name": "ToonWorld",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
