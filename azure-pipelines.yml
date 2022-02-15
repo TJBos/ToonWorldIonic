@@ -111,7 +111,7 @@ jobs:
   #   inputs:
   #     serverEndpoint: 'AppCenter'
   #     appSlug: 'toonbosmans/ToonWorld'
-  #     appFile: '$(Build.ArtifactStagingDirectory)/*.ipa'
+  #     appFile: '$(Build.BinariesDirectory)/*.ipa'
   #     releaseNotesOption: 'input'
   #     releaseNotesInput: 'This is a test'
   #     destinationType: 'store'
@@ -154,7 +154,7 @@ jobs:
       apksignerKeystorePassword: '$(password_keystore)'
 
   - task: CopyFiles@2 
-    displayName: 'copy **/outputs/apk/release/app*.apk to $(Build.BinariesDirectory)'
+    displayName: 'copy apk to $(Build.BinariesDirectory)'
     inputs:
       Contents: '**/outputs/apk/release/*.apk'
       TargetFolder: '$(Build.BinariesDirectory)'
