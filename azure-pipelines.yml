@@ -149,14 +149,14 @@ jobs:
   - task: AndroidSigning@3
     displayName: 'android signing'
     inputs:
-      apkFiles: '**/outputs/apk/release/*.apk'
+      apkFiles: '**/outputs/apk/release/app*.apk'
       apksignerKeystoreFile: 'toonworld.keystore'
-      apksignerKeystorePassword: '$(password_keystore)'
+      apksignerKeystorePassword: '$(keystore_password)'
 
   - task: CopyFiles@2 
     displayName: 'copy apk to $(Build.BinariesDirectory)'
     inputs:
-      Contents: '**/outputs/apk/release/*.apk'
+      Contents: '**/outputs/apk/release/app*.apk'
       TargetFolder: '$(Build.BinariesDirectory)'
       flattenFolders: true
 
