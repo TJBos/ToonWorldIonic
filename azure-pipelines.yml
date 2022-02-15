@@ -125,11 +125,11 @@ jobs:
   steps:
   - script: |
         npm install -g @ionic/cli@6.18.1
-        displayName: 'Install Ionic'
+    displayName: 'Install Ionic'
     
   - script: |
         npm install -g cordova@11.0.0 cordova-res
-        displayName: 'Install Cordova'
+    displayName: 'Install Cordova'
   
   - task: CmdLine@2
     inputs:
