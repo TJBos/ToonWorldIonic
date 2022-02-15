@@ -99,18 +99,77 @@ jobs:
   - task: CopyFiles@2
     inputs:
       contents: '**/*.ipa'
-      targetFolder: '$(build.artifactStagingDirectory)'
+      targetFolder: '$(build.BinariesDirectory)'
+      flattenFolders: true
   - task: PublishBuildArtifacts@1
     inputs:
-      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      ArtifactName: 'drop'
-      publishLocation: 'Container'
+      PathtoPublish: '$(Build.BinariesDirectory)'
+      ArtifactName: 'ios-app'
+      
   
   # - task: AppCenterDistribute@3
   #   inputs:
   #     serverEndpoint: 'AppCenter'
   #     appSlug: 'toonbosmans/ToonWorld'
   #     appFile: '$(Build.ArtifactStagingDirectory)/*.ipa'
+  #     releaseNotesOption: 'input'
+  #     releaseNotesInput: 'This is a test'
+  #     destinationType: 'store'
+  #     destinationStoreId: 'fillthisout'
+
+- job: build_android
+  variables:
+    - group: mobile-app
+
+  displayName: "Build Android APK"
+  dependsOn: Build_JS
+  condition: succeeded('Build_JS')
+  pool:
+    vmImage: macos-latest
+  
+  steps:
+  - script: |
+        npm install -g @ionic/cli@6.18.1
+        displayName: 'Install Ionic'
+    
+  - script: |
+        npm install -g cordova@11.0.0 cordova-res
+        displayName: 'Install Cordova'
+  
+  - task: CmdLine@2
+    inputs:
+      script: 'ionic cordova platform add android --save'
+    displayName: 'add android platform'
+  
+  - task: CmdLine@2
+    inputs:
+      script: 'ionic cordova build android --prod --release'
+    displayName: 'build android'
+  
+  - task: AndroidSigning@3
+    displayName: 'android signing'
+    inputs:
+      apkFiles: '**/outputs/apk/release/*.apk'
+      apksignerKeystoreFile: 'toonworld.keystore'
+      apksignerKeystorePassword: '$(password_keystore)'
+
+  - task: CopyFiles@2 
+    displayName: 'copy **/outputs/apk/release/app*.apk to $(Build.BinariesDirectory)'
+    inputs:
+      Contents: '**/outputs/apk/release/*.apk'
+      TargetFolder: '$(Build.BinariesDirectory)'
+      flattenFolders: true
+
+
+  - publish: '$(Build.BinariesDirectory)' 
+    artifact: 'android-app'
+    displayName: 'publish android apk artifact'
+  
+  # - task: AppCenterDistribute@3
+  #   inputs:
+  #     serverEndpoint: 'AppCenter'
+  #     appSlug: 'toonbosmans/ToonWorld'
+  #     appFile: '$(Build.BinariesDirectory)/*.apk'
   #     releaseNotesOption: 'input'
   #     releaseNotesInput: 'This is a test'
   #     destinationType: 'store'
