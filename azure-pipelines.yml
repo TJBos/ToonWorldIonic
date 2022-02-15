@@ -138,7 +138,7 @@ jobs:
   
   - task: CmdLine@2
     inputs:
-      script: 'ionic cordova build android --prod --release'
+      script: 'ionic cordova build android --no-build --release'
     displayName: 'build android'
   
   - task: AndroidSigning@3
