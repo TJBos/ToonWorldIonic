@@ -26,85 +26,80 @@ jobs:
   #     artifact: 'dist'
   #     publishLocation: 'pipeline'
       
-- job: build_ios
-  variables:
-    - group: mobile-app
+# - job: build_ios
+#   variables:
+#     - group: mobile-app
 
-  displayName: "Build iOS IPA"
-  dependsOn: Build_JS
-  condition: succeeded('Build_JS')
-  pool:
-    vmImage: macos-latest
+#   displayName: "Build iOS IPA"
+#   dependsOn: Build_JS
+#   condition: succeeded('Build_JS')
+#   pool:
+#     vmImage: macos-latest
   
-  steps:
-  # - task: DownloadPipelineArtifact@2
-  #   displayName: 'Download build artifact'
-  #   inputs:
-  #     buildType: 'current'
-  #     artifactName: 'dist'
-  #     targetPath: '$(Build.ArtifactStagingDirectory)'
+#   steps:
+#   # - task: DownloadPipelineArtifact@2
+#   #   displayName: 'Download build artifact'
+#   #   inputs:
+#   #     buildType: 'current'
+#   #     artifactName: 'dist'
+#   #     targetPath: '$(Build.ArtifactStagingDirectory)'
   
-  # - task: ExtractFiles@1
-  #   inputs:
-  #     archiveFilePatterns: '$(Build.ArtifactStagingDirectory)/**/*.zip'
-  #     destinationFolder: '$(Build.ArtifactStagingDirectory)/'
-  #     cleanDestinationFolder: false
+#   # - task: ExtractFiles@1
+#   #   inputs:
+#   #     archiveFilePatterns: '$(Build.ArtifactStagingDirectory)/**/*.zip'
+#   #     destinationFolder: '$(Build.ArtifactStagingDirectory)/'
+#   #     cleanDestinationFolder: false
 
-  - script: |
-      npm install -g @ionic/cli@6.18.1
-    displayName: 'Install Ionic'
+#   - script: |
+#       npm install -g @ionic/cli@6.18.1
+#     displayName: 'Install Ionic'
   
-  - script: |
-      npm install -g cordova@11.0.0 cordova-res
-    displayName: 'Install Cordova'
+#   - script: |
+#       npm install -g cordova@11.0.0 cordova-res
+#     displayName: 'Install Cordova'
   
-  # - task: CmdLine@2
-  #   inputs:
-  #     script: 'cd $(Build.ArtifactStagingDirectory)/s'
-  #   displayName: 'Change Directory'
+#   - task: CmdLine@2
+#     inputs:
+#       script: 'ionic cordova platform add ios@6.2.0 --save'
+#     displayName: 'add ios platform'
   
-  - task: CmdLine@2
-    inputs:
-      script: 'ionic cordova platform add ios@6.2.0 --save'
-    displayName: 'add ios platform'
-  
-  - task: CmdLine@2
-    inputs:
-      script: 'ionic cordova prepare ios'
-    displayName: 'bundle ios files'
-  - task: InstallAppleCertificate@2
-    inputs:
-      certSecureFile: 'distribute.p12'
-      certPwd: '$(p12password)'
-      keychain: 'temp'
+#   - task: CmdLine@2
+#     inputs:
+#       script: 'ionic cordova prepare ios'
+#     displayName: 'bundle ios files'
+#   - task: InstallAppleCertificate@2
+#     inputs:
+#       certSecureFile: 'distribute.p12'
+#       certPwd: '$(p12password)'
+#       keychain: 'temp'
     
-  - task: InstallAppleProvisioningProfile@1
-    inputs:
-      provisioningProfileLocation: secureFiles
-      provProfileSecureFile: 'toonworldapp.mobileprovision'
+#   - task: InstallAppleProvisioningProfile@1
+#     inputs:
+#       provisioningProfileLocation: secureFiles
+#       provProfileSecureFile: 'toonworldapp.mobileprovision'
   
-  - task: Xcode@5
-    inputs:
-      actions: 'build'
-      xcWorkspacePath: 'platforms/ios/*.xcworkspace'
-      scheme: 'ToonWorldApp'
-      sdk: 'iphoneos'
-      configuration: 'Release'
-      packageApp: true
-      signingOption: 'manual'
-      signingIdentity: '$(APPLE_CERTIFICATE_SIGNING_IDENTITY)'
-      provisioningProfileUuid: '$(APPLE_PROV_PROFILE_UUID)'
-    displayName: 'Build and sign iOS App'
+#   - task: Xcode@5
+#     inputs:
+#       actions: 'build'
+#       xcWorkspacePath: 'platforms/ios/*.xcworkspace'
+#       scheme: 'ToonWorldApp'
+#       sdk: 'iphoneos'
+#       configuration: 'Release'
+#       packageApp: true
+#       signingOption: 'manual'
+#       signingIdentity: '$(APPLE_CERTIFICATE_SIGNING_IDENTITY)'
+#       provisioningProfileUuid: '$(APPLE_PROV_PROFILE_UUID)'
+#     displayName: 'Build and sign iOS App'
   
-  - task: CopyFiles@2
-    inputs:
-      contents: '**/*.ipa'
-      targetFolder: '$(build.BinariesDirectory)'
-      flattenFolders: true
-  - task: PublishBuildArtifacts@1
-    inputs:
-      PathtoPublish: '$(Build.BinariesDirectory)'
-      ArtifactName: 'ios-app'
+#   - task: CopyFiles@2
+#     inputs:
+#       contents: '**/*.ipa'
+#       targetFolder: '$(build.BinariesDirectory)'
+#       flattenFolders: true
+#   - task: PublishBuildArtifacts@1
+#     inputs:
+#       PathtoPublish: '$(Build.BinariesDirectory)'
+#       ArtifactName: 'ios-app'
       
   
   # - task: AppCenterDistribute@3
@@ -163,7 +158,7 @@ jobs:
 
   - publish: '$(Build.BinariesDirectory)' 
     artifact: 'android-app'
-    displayName: 'publish android apk artifact'
+    displayName: 'publish android apk artifacts'
   
   # - task: AppCenterDistribute@3
   #   inputs:
