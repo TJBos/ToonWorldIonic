@@ -144,7 +144,7 @@ jobs:
   - task: AndroidSigning@2
     displayName: 'android signing'
     inputs:
-      apkFiles: '**/outputs/apk/release/*.aab'
+      apkFiles: 'platforms/android/**/*.aab'
       jarsign: true
       jarsignerKeystoreFile: 'toonworld.keystore'
       jarsignerKeyPassword: '$(keystore_password)'
@@ -154,14 +154,14 @@ jobs:
   - task: CopyFiles@2 
     displayName: 'copy apk to $(Build.BinariesDirectory)'
     inputs:
-      Contents: '**/outputs/apk/release/*.aab'
+      Contents: '**/*.aab'
       TargetFolder: '$(Build.BinariesDirectory)'
       flattenFolders: true
 
 
   - publish: '$(Build.BinariesDirectory)' 
     artifact: 'android-app'
-    displayName: 'publish android apk artifacts'
+    displayName: 'publish android bundle artifacts'
   
   # - task: AppCenterDistribute@3
   #   inputs:
