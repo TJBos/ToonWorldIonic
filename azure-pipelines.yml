@@ -148,7 +148,7 @@ jobs:
       jarsign: true
       jarsignerKeystoreFile: 'toonworld.keystore'
       jarsignerKeystoreAlias: 'toonworld'
-      jarsignerKeyPassword: '$(keystore_password)'
+      jarsignerKeystorePassword: '$(keystore_password)'
       jarsignerArguments: '-sigalg SHA256withRSA -digestalg SHA-256'
       zipalign: true
 
