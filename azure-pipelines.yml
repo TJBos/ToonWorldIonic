@@ -141,17 +141,20 @@ jobs:
       script: 'ionic cordova build android --no-build --release'
     displayName: 'build android'
   
-  - task: AndroidSigning@3
+  - task: AndroidSigning@2
     displayName: 'android signing'
     inputs:
-      apkFiles: '**/outputs/apk/release/app*.apk'
-      apksignerKeystoreFile: 'toonworld.keystore'
-      apksignerKeystorePassword: '$(keystore_password)'
+      apkFiles: '**/outputs/apk/release/*.aab'
+      jarsign: true
+      jarsignerKeystoreFile: 'toonworld.keystore'
+      jarsignerKeyPassword: '$(keystore_password)'
+      jarsignerArguments: '-sigalg SHA256withRSA -digestalg SHA-256'
+      zipalign: true
 
   - task: CopyFiles@2 
     displayName: 'copy apk to $(Build.BinariesDirectory)'
     inputs:
-      Contents: '**/outputs/apk/release/app*.apk'
+      Contents: '**/outputs/apk/release/*.aab'
       TargetFolder: '$(Build.BinariesDirectory)'
       flattenFolders: true
 
