@@ -139,7 +139,10 @@ jobs:
   #     jarsignerKeystorePassword: '$(keystore_password)'
   #     jarsignerArguments: '-sigalg SHA256withRSA -digestalg SHA-256'
   #     zipalign: true
-  
+  - script: |
+        sudo apt-get install lib32z1
+    displayName: "sudo apt-get install lib32z1"
+
   - task: AndroidSigning@3
     inputs:
       apkFiles: '**/*.apk'
