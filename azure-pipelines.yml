@@ -4,7 +4,7 @@ jobs:
 - job: Build_JS
   displayName: "Build JS Bundle"
   pool:
-    vmImage: 'macos-latest'
+    vmImage: 'ubuntu-latest'
   steps:
   - task: NodeTool@0
     inputs:
@@ -25,17 +25,17 @@ jobs:
   #     artifact: 'dist'
   #     publishLocation: 'pipeline'
       
-- job: build_ios
-  variables:
-    - group: mobile-app
+# - job: build_ios
+#   variables:
+#     - group: mobile-app
 
-  displayName: "Build iOS IPA"
-  dependsOn: Build_JS
-  condition: succeeded('Build_JS')
-  pool:
-    vmImage: macos-latest
+#   displayName: "Build iOS IPA"
+#   dependsOn: Build_JS
+#   condition: succeeded('Build_JS')
+#   pool:
+#     vmImage: macos-latest
   
-  steps:
+  # steps:
 #   # - task: DownloadPipelineArtifact@2
 #   #   displayName: 'Download build artifact'
 #   #   inputs:
@@ -49,105 +49,112 @@ jobs:
 #   #     destinationFolder: '$(Build.ArtifactStagingDirectory)/'
 #   #     cleanDestinationFolder: false
 
-  - script: |
-      npm install -g @ionic/cli@6.18.1
-    displayName: 'Install Ionic'
+  # - script: |
+  #     npm install -g @ionic/cli@6.18.1
+  #   displayName: 'Install Ionic'
   
+  # - script: |
+  #     npm install -g cordova@11.0.0 cordova-res
+  #   displayName: 'Install Cordova'
+  
+  # - task: CmdLine@2
+  #   inputs:
+  #     script: 'ionic cordova platform add ios@6.2.0 --save'
+  #   displayName: 'add ios platform'
+  
+  # - task: CmdLine@2
+  #   inputs:
+  #     script: 'ionic cordova prepare ios'
+  #   displayName: 'bundle ios files'
+  # - task: InstallAppleCertificate@2
+  #   inputs:
+  #     certSecureFile: 'distribute.p12'
+  #     certPwd: '$(p12password)'
+  #     keychain: 'temp'
+    
+  # - task: InstallAppleProvisioningProfile@1
+  #   inputs:
+  #     provisioningProfileLocation: secureFiles
+  #     provProfileSecureFile: 'toonworldadhoc.mobileprovision'
+  
+  # - task: Xcode@5
+  #   inputs:
+  #     actions: 'build'
+  #     xcWorkspacePath: 'platforms/ios/*.xcworkspace'
+  #     scheme: 'ToonWorldApp'
+  #     sdk: 'iphoneos'
+  #     configuration: 'Release'
+  #     packageApp: true
+  #     signingOption: 'manual'
+  #     signingIdentity: '$(APPLE_CERTIFICATE_SIGNING_IDENTITY)'
+  #     provisioningProfileUuid: '$(APPLE_PROV_PROFILE_UUID)'
+  #   displayName: 'Build and sign iOS App'
+  
+  # - task: CopyFiles@2
+  #   inputs:
+  #     contents: '**/*.ipa'
+  #     targetFolder: '$(build.BinariesDirectory)'
+  #     flattenFolders: true
+  # - task: PublishBuildArtifacts@1
+  #   inputs:
+  #     PathtoPublish: '$(Build.BinariesDirectory)'
+  #     ArtifactName: 'ios-app'
+
+- job: build_android
+  variables:
+    - group: mobile-app
+
+  displayName: "Build Android APK"
+  dependsOn: Build_JS
+  condition: succeeded('Build_JS')
+  pool:
+    vmImage: 'ubuntu-latest'
+  
+  steps:
   - script: |
-      npm install -g cordova@11.0.0 cordova-res
+        npm install -g @ionic/cli@latest
+    displayName: 'Install Ionic'
+    
+  - script: |
+        npm install -g cordova@latest
     displayName: 'Install Cordova'
   
   - task: CmdLine@2
     inputs:
-      script: 'ionic cordova platform add ios@6.2.0 --save'
-    displayName: 'add ios platform'
+      script: 'ionic cordova platform add android --save'
+    displayName: 'add android platform'
   
   - task: CmdLine@2
     inputs:
-      script: 'ionic cordova prepare ios'
-    displayName: 'bundle ios files'
-  - task: InstallAppleCertificate@2
-    inputs:
-      certSecureFile: 'distribute.p12'
-      certPwd: '$(p12password)'
-      keychain: 'temp'
-    
-  - task: InstallAppleProvisioningProfile@1
-    inputs:
-      provisioningProfileLocation: secureFiles
-      provProfileSecureFile: 'toonworldadhoc.mobileprovision'
+      script: 'ionic cordova build android --no-build --release'
+    displayName: 'build android'
   
-  - task: Xcode@5
-    inputs:
-      actions: 'build'
-      xcWorkspacePath: 'platforms/ios/*.xcworkspace'
-      scheme: 'ToonWorldApp'
-      sdk: 'iphoneos'
-      configuration: 'Release'
-      packageApp: true
-      signingOption: 'manual'
-      signingIdentity: '$(APPLE_CERTIFICATE_SIGNING_IDENTITY)'
-      provisioningProfileUuid: '$(APPLE_PROV_PROFILE_UUID)'
-    displayName: 'Build and sign iOS App'
+  # - task: AndroidSigning@2
+  #   displayName: 'android signing'
+  #   inputs:
+  #     apkFiles: 'platforms/android/**/*.aab'
+  #     jarsign: true
+  #     jarsignerKeystoreFile: 'toonworld.keystore'
+  #     jarsignerKeystoreAlias: 'toonworld'
+  #     jarsignerKeystorePassword: '$(keystore_password)'
+  #     jarsignerArguments: '-sigalg SHA256withRSA -digestalg SHA-256'
+  #     zipalign: true
   
-  - task: CopyFiles@2
+  - task: AndroidSigning@3
     inputs:
-      contents: '**/*.ipa'
-      targetFolder: '$(build.BinariesDirectory)'
+      apkFiles: '**/*.apk'
+      apksignerKeystoreFile: 'toonworld.keystore'
+      apksignerKeystorePassword: '$(keystore_password)'
+      apksignerKeystoreAlias: 'toonworld'
+
+  - task: CopyFiles@2 
+    displayName: 'copy apk to $(Build.BinariesDirectory)'
+    inputs:
+      Contents: '**/*.apk'
+      TargetFolder: '$(Build.BinariesDirectory)'
       flattenFolders: true
-  - task: PublishBuildArtifacts@1
-    inputs:
-      PathtoPublish: '$(Build.BinariesDirectory)'
-      ArtifactName: 'ios-app'
-
-# - job: build_android
-#   variables:
-#     - group: mobile-app
-
-#   displayName: "Build Android APK"
-#   dependsOn: Build_JS
-#   condition: succeeded('Build_JS')
-#   pool:
-#     vmImage: macos-latest
-  
-#   steps:
-#   - script: |
-#         npm install -g @ionic/cli@6.18.1
-#     displayName: 'Install Ionic'
-    
-#   - script: |
-#         npm install -g cordova@11.0.0 cordova-res
-#     displayName: 'Install Cordova'
-  
-#   - task: CmdLine@2
-#     inputs:
-#       script: 'ionic cordova platform add android --save'
-#     displayName: 'add android platform'
-  
-#   - task: CmdLine@2
-#     inputs:
-#       script: 'ionic cordova build android --no-build --release'
-#     displayName: 'build android'
-  
-#   - task: AndroidSigning@2
-#     displayName: 'android signing'
-#     inputs:
-#       apkFiles: 'platforms/android/**/*.aab'
-#       jarsign: true
-#       jarsignerKeystoreFile: 'toonworld.keystore'
-#       jarsignerKeystoreAlias: 'toonworld'
-#       jarsignerKeystorePassword: '$(keystore_password)'
-#       jarsignerArguments: '-sigalg SHA256withRSA -digestalg SHA-256'
-#       zipalign: true
-
-#   - task: CopyFiles@2 
-#     displayName: 'copy apk to $(Build.BinariesDirectory)'
-#     inputs:
-#       Contents: '**/*.aab'
-#       TargetFolder: '$(Build.BinariesDirectory)'
-#       flattenFolders: true
 
 
-#   - publish: '$(Build.BinariesDirectory)' 
-#     artifact: 'android-app'
-#     displayName: 'publish android bundle artifacts'
+  - publish: '$(Build.BinariesDirectory)' 
+    artifact: 'android-app'
+    displayName: 'publish android bundle artifacts'
