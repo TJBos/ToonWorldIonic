@@ -4,7 +4,7 @@ jobs:
 - job: Build_JS
   displayName: "Build JS Bundle"
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: 'macos-latest'
   steps:
   - task: NodeTool@0
     inputs:
@@ -108,7 +108,7 @@ jobs:
   dependsOn: Build_JS
   condition: succeeded('Build_JS')
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: 'macos-latest'
   
   steps:
   - script: |
@@ -139,10 +139,6 @@ jobs:
   #     jarsignerKeystorePassword: '$(keystore_password)'
   #     jarsignerArguments: '-sigalg SHA256withRSA -digestalg SHA-256'
   #     zipalign: true
-  - script: |
-        sudo apt-get install lib32z1
-    displayName: "sudo apt-get install lib32z1"
-
   - task: AndroidSigning@3
     inputs:
       apkFiles: 'platforms/android/**/*.apk'
